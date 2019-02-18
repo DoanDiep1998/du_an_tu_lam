@@ -1,0 +1,224 @@
+﻿@model IEnumerable<Data.DataModel.Bill>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<table class="shopping-cart-table table">
+    <thead>
+        <tr>
+            <th>Tên người mua</th>
+            <th>Tên người nhận</th>
+            <th>Tổng tiền</th>
+            <th>Ngày mua</th>
+            <th>Số điện thoại</th>
+            <th>Địa chỉ</th>
+            <th>Trạng thái</th>
+
+            <th>Tác vụ</th>
+        </tr>
+    </thead>
+    <tbody class="data-bill">
+
+       
+            
+       
+    </tbody>
+
+</table>
+<button ></button>
+<ul class="pagination" id="pageData"></ul>
+<div class="modal fade" id="myModalBillDetail" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Chi tiết đơn hàng</h4>
+            </div>
+            <div class="modal-body">
+               
+                <table class="shopping-cart-table table">
+								<thead>
+                                    <tr>
+                                        <th>Ảnh</th>
+                                        <th>Tên</th>
+                                        <th>Giá</th>
+                                        <th>Số lượng</th>
+                                    </tr>
+								</thead>
+                                <tbody class="dataDetail">
+                                    <tr>
+                                        <td class="thumb"><img src="./img/thumb-product01.jpg" alt=""></td>
+                                        <td class="details">
+                                            <a href="">Product Name Goes Here</a>
+                                        </td>
+                                        <td class="price text-center"><strong>$32.50</strong><br><del class="font-weak"><small>$40.00</small></del></td>
+                                        <td class="qty text-center"><input class="input" type="number" value="1"></td>
+                                        <td class="total text-center"><strong class="primary-color">$32.50</strong></td>
+                                        <td class="text-right"></td>
+                                    </tr>
+
+                                </tbody>
+								
+							</table>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default " onclick="update()" data-dismiss="modal">Cập nhật</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+@section scripts{
+    <script>
+        function LoadData(pageNumber, pageSize) {
+            $.ajax({
+                type: 'GET',
+                url: '/Bill/getAll',
+                data: {
+                    'page': pageNumber,
+                    'pageSize': pageSize
+                },
+               
+                success: function (res) {
+                    res = JSON.parse(res);
+                    console.log(res);
+                    var row = ""
+                    $.each(res.Data, function (key, value) {
+                        key++;
+                        row += '<tr>';
+                        row += '<td>' + value.Customer.CustomerName + '</td>';
+                        row += '<td>' + value.CustomerName + '</td>';
+                        row += '<td>' + value.TotalMoney.toLocaleString('vi-VN', { useGrouping: true }) + '<sup>đ</sup></td>';
+                        row += '<td>' + value.CreateDate + '</td>';
+                        row += '<td>' + value.Phone + '</td > <td>' + value.Address + '</td > ';
+                        if (value.Status == false) {
+                            row += '<td style="color:darksalmon">Chờ xử lý</td>';
+                        } else {
+                            row += '<td style="color:aqua">Đã xử lý</td>';
+                        }
+                        row += '  <td class="text-right"><button class="main-btn btn-detail" onclick="getIdDetail($(this))" data-id="'+ value.BillId +'"><i class="fa fa-book"> </i> chi tiết</button></td>';
+                        if (value.Status == false) {
+                            row += '<td><button class="main-btn icon-btn"><i class="fa fa-close"></i></button></td>';
+                        } else {
+                            row += ' <td></td></tr>';
+                        }
+
+
+                    })
+                    $('.data-bill').html(row);
+                    var active = "";
+                    var Previous = (res.CurrentPage - 1) > 1 ? (res.CurrentPage - 1) : 1;
+                    var Next = (res.CurrentPage + 1) < res.PageOfNumber ? res.CurrentPage + 1 : res.PageOfNumber;
+                    var pageData = '<li class="page-item"><a class="page - link" onclick="LoadData(' + Previous + ',' + pageSize + '); return false;" href="javascript:void(0)" >Previous</a></li>';
+                    for (var i = 1; i < res.PageOfNumber + 1; i++) {
+                        active = i == res.CurrentPage ? "active" : "";
+
+                        pageData += '<li class="page-item ' + active + '" ><a class="page-link"  onclick="LoadData(' + i + ',' + pageSize + '); return false;" href="javascript:void(0)">' + i + '</a></li>';
+
+
+
+                    }
+                    pageData += '<li class="page-item"><a class="page-link" onclick="LoadData( ' + Next + ',' + pageSize + '); return false;" href="#" >Next</a></li>';
+                    $('#pageData').html(pageData);
+                }
+            })
+
+        } 
+        var dataId = "";
+
+        function getIdDetail(btn) {
+            var dataid = btn.data('id');
+            if (dataid == undefined) {
+                alert(' không thể lấy thông tin!');
+            } else {
+                getBillDetail(dataid);
+                dataId = dataid;
+            }
+        }
+        function update() {
+            $.ajax({
+                type: 'POST',
+                url: '/Bill/UpdateBill',
+                data: {
+                    'id': dataId
+                },
+                success: function (res) {
+                    if (res == "success") {
+                        alert('Cập nhật thành công');
+                        LoadData();
+                        dataId = "";
+
+                    } else {
+                        alert('Cập nhật thất bại');
+                        LoadData();
+                        dataId = "";
+                    }
+
+                }
+
+            })
+        
+        }
+        function getBillDetail(dataid) {
+            $.ajax({
+                type: 'GET',
+                url: '/Bill/HistoryBillDetail',
+                data: {
+                    'id': dataid
+                },
+                success: function (res) {
+                    res = JSON.parse(res)
+                    
+                    $('.dataDetail').empty();
+                    var row = ""
+                    $.each(res, function (key, value) {
+                        key++;
+                       
+                        row += '<tr>';
+                        row += '<td class="thumb"><img src="' + value.Product.PictureShow + '" width="75" /></td>';
+                        row += '<td class="details"><a>' + value.Product.ProductName + '</a></td>';
+                        
+                        row += '<td price text-center><strong>' + value.Price.toLocaleString('vi-VN', { useGrouping: true })+ '<sup> đ</sup></strong></td>';
+                        row += '<td total text-center><strong class="primary-color">' + value.Total + '</strong></td>';
+                       row += '</tr>'
+                    })
+                    $('.dataDetail').html(row);
+                    $('#myModalBillDetail').modal();
+
+                }
+            })
+        };
+       
+
+        $(function () {
+            LoadData();
+           
+            $('.btn-Update').on('click', function () {
+                $.ajax({
+                    type: 'POST',
+                    url: '/Bill/UpdateBill',
+                    data: {
+                        'id': dataId
+                    },
+                    success: function (res) {
+                        if (res == "success") {
+                            alert('Cập nhật thành công');
+
+                        } else {
+                            alert('Cập nhật thất bại');
+                        }
+
+                    }
+
+                })
+            })
+        });
+    </script>
+
+}

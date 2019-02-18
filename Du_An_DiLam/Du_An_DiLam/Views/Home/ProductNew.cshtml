@@ -1,0 +1,52 @@
+﻿@using Data.DataModel;
+@model IEnumerable<Product>
+@{
+    Layout = null;
+}
+
+@{
+    foreach (var item in Model)
+    {
+        <div class="product product-single">
+            <div class="product-thumb">
+                <div class="product-label">
+                    <span>Mới</span>
+                    @if (item.PriceSale != 0)
+                    {
+                        <span class="sale">Sale</span>
+                    }
+
+                </div>
+
+                <a class="main-btn quick-view" href="@Url.Action("getProductById","Home",new {id=item.ProductId })" ><i class="fa fa-search-plus"></i>   Chi tiết</a>
+                <img src="@item.PictureShow" alt="">
+            </div>
+            <div class="product-body">
+                <h3 class="product-price">
+                    @if (item.PriceSale != 0)
+                    {
+                        @String.Format("{0:0,0}", @item.PriceSale)<sup>đ</sup>
+                        <del class="product-old-price"> @String.Format("{0:0,0}", @item.Price)<sup>đ</sup></del>
+                    }
+                    else{
+                    @String.Format("{0:0,0}", @item.Price)<sup>đ</sup>
+                     }
+
+                </h3>
+                <div class="product-rating">
+                    <i class="fa fa-star"></i>
+                    <i class="fa fa-star"></i>
+                    <i class="fa fa-star"></i>
+                    <i class="fa fa-star"></i> 
+                    <i class="fa fa-star-o empty"></i>
+                </div>
+                <h2 class="product-name"><a href="#">@item.ProductName</a></h2>
+                <div class="product-btns">
+                    <button class="main-btn icon-btn"><i class="fa fa-heart"></i></button>
+                    <button class="main-btn icon-btn"><i class="fa fa-exchange"></i></button>
+                    <button class="primary-btn add-to-cart btn-addproduct"  data-id="@item.ProductId" data-name="@item.ProductName" data-price="@item.Price" data-pricesale="@item.PriceSale" data-pictureshow="@item.PictureShow"><i class="fa fa-shopping-cart"></i>Thêm vào giỏ </button>
+                </div>
+            </div>
+        </div>
+    }
+}

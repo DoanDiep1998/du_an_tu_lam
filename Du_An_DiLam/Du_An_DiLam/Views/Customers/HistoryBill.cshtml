@@ -1,0 +1,151 @@
+﻿@model IEnumerable<Data.DataModel.Bill>
+@{
+    ViewBag.Title = "Đơn hàng đã mua";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<table class="shopping-cart-table table">
+    <thead>
+        <tr>
+            <th>Tên người mua</th>
+            <th>Tên người nhận</th>
+
+            <th>Tổng tiền</th>
+            <th>Ngày mua</th>
+            <th>Số điện thoại</th>
+            <th>Địa chỉ</th>
+            <th>Trạng thái</th>
+
+            <th>Tác vụ</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var item in Model)
+        {
+        <tr>
+            <td>@item.Customer.CustomerName</td>
+            <td>@item.CustomerName</td>
+            <td>@String.Format("{0:0,0}", item.TotalMoney)<sup>đ</sup> </td>
+            <td>@item.CreateDate</td>
+            <td>@item.Phone</td>
+            <td>@item.Address</td>
+            @if (item.Status == false)
+            {
+                <td style="color:darksalmon">Chờ xử lý</td>
+            }
+            else
+            {
+                <td style="color:aqua">Đã xử lý</td>
+            }
+
+
+            <td class="text-right">
+                <button class="main-btn btn-detail " data-id="@item.BillId"><i class="fa fa-book"> </i>  chi tiết</button>
+            </td>
+            @if (item.Status == false)
+            {
+                <td><button class="main-btn icon-btn"><i class="fa fa-close"></i></button></td>
+            }
+            else
+            {
+                <td></td>
+            }
+
+
+        </tr>
+        }
+    </tbody>
+
+</table>
+<!-- modal chi tiết đơn hàng-->
+<div class="modal fade" id="myModalBillDetail" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Chi tiết đơn hàng</h4>
+            </div>
+            <div class="modal-body">
+               
+                <table class="shopping-cart-table table">
+								<thead>
+                                    <tr>
+                                        <th>Ảnh</th>
+                                        <th>Tên</th>
+                                        <th>Giá</th>
+                                        <th>Số lượng</th>
+                                    </tr>
+								</thead>
+                                <tbody class="dataDetail">
+                                    <tr>
+                                        <td class="thumb"><img src="./img/thumb-product01.jpg" alt=""></td>
+                                        <td class="details">
+                                            <a href="">Product Name Goes Here</a>
+                                        </td>
+                                        <td class="price text-center"><strong>$32.50</strong><br><del class="font-weak"><small>$40.00</small></del></td>
+                                        <td class="qty text-center"><input class="input" type="number" value="1"></td>
+                                        <td class="total text-center"><strong class="primary-color">$32.50</strong></td>
+                                        <td class="text-right"></td>
+                                    </tr>
+
+                                </tbody>
+								
+							</table>
+            </div>
+
+            <div class="modal-footer">
+                
+                <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+@section scripts{
+    <script>
+        function getBillDetail(dataid) {
+            $.ajax({
+                type: 'GET',
+                url: '/Customers/HistoryBillDetail',
+                data: {
+                    'id': dataid
+                },
+                success: function (res) {
+                    res = JSON.parse(res)
+                    
+                    $('.dataDetail').empty();
+                    var row = ""
+                    $.each(res, function (key, value) {
+                        key++;
+                       
+                        row += '<tr>';
+                        row += '<td class="thumb"><img src="' + value.Product.PictureShow + '" width="75" /></td>';
+                        row += '<td class="details"><a>' + value.Product.ProductName + '</a></td>';
+                        
+                        row += '<td price text-center><strong>' + value.Price.toLocaleString('vi-VN', { useGrouping: true })+ '<sup> đ</sup></strong></td>';
+                        row += '<td total text-center><strong class="primary-color">' + value.Total + '</strong></td>';
+                       row += '</tr>'
+                    })
+                    $('.dataDetail').html(row);
+                    $('#myModalBillDetail').modal();
+
+                }
+            })
+        };
+        $(function () {
+            $('.btn-detail').on('click', function (evt) {
+                var dataid = $(evt.target).data('id');
+                if (dataid == undefined) {
+                    alert(' không thể lấy thông tin!');
+                } else {
+                    getBillDetail(dataid);
+                }
+
+            })
+        });
+    </script>
+
+}

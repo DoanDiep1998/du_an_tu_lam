@@ -1,0 +1,243 @@
+﻿@model Data.DataModel.Product
+@{
+    ViewBag.Title = "getProductById";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="section">
+    <!-- container -->
+    <div class="container">
+        <!-- row -->
+        <div class="row">
+            <!--  Product Details -->
+            <div class="product product-details clearfix">
+                <div class="col-md-6">
+                    @{
+                        string[] dataImg = Model.Picture.Split(';');
+                    }
+                    <div id="product-main-view">
+                        @for (int i = 0; i < dataImg.Count() - 1; i++)
+                        {
+
+                            <div class="product-view">
+                                <img src="@dataImg[i]" alt="">
+                            </div>
+                        }
+                        
+
+                    </div>
+                    <div id="product-view">
+                        @for (int i = 0; i < dataImg.Count() - 1; i++)
+                        {
+
+                            <div class="product-view">
+                                <img src="@dataImg[i]" alt="">
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="product-body dataId " data-id="@Model.ProductId">
+                        <div class="product-label">
+
+
+                        </div>
+                        <h2 class="product-name">@Model.ProductName</h2>
+                        @if (Model.PriceSale != 0)
+                        {
+                            <h3 class="product-price"> @String.Format("{0:0,0}", Model.PriceSale)<sup>đ</sup> <del class="product-old-price"> @String.Format("{0:0,0}", Model.Price)<sup>đ</sup></del></h3>
+                        }
+                        else
+                        {
+                            <h3 class="product-price"> @String.Format("{0:0,0}", Model.Price)<sup>đ</sup></h3>
+                        }<div>
+                            <div class="product-rating">
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star-o empty"></i>
+                            </div>
+                            <a data-toggle="tab" href="#tab2">Đánh giá</a>
+                        </div>
+                        <p><strong>Danh mục:</strong>@Model.CategoryDetail.CategoryDetailName</p>
+                        <p><strong>Nhà cung cấp:</strong>@Model.Supplier.SupplierName</p>
+
+
+
+                        <div class="product-btns">
+
+                            <button class="primary-btn add-to-cart btn-addproduct" data-id="@Model.ProductId" data-name="@Model.ProductName" data-price="@Model.Price" data-pricesale="@Model.PriceSale" data-pictureshow="@Model.PictureShow"><i class="fa fa-shopping-cart"></i> Thêm vào giỏ</button>
+                            <div class="pull-right">
+                                <button class="main-btn icon-btn"><i class="fa fa-heart"></i></button>
+                                <button class="main-btn icon-btn"><i class="fa fa-exchange"></i></button>
+                                <button class="main-btn icon-btn"><i class="fa fa-share-alt"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="product-tab">
+                        <ul class="tab-nav">
+                            <li class="active"><a data-toggle="tab" href="#tab1">Mô tả</a></li>
+
+                            <li><a data-toggle="tab" href="#tab2">Đánh giá</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div id="tab1" class="tab-pane fade in active">
+                                <p>
+                                    @Model.Description
+                                </p>
+                            </div>
+                            <div id="tab2" class="tab-pane fade in">
+
+                                <div class="row">
+                                    <div class="col-md-6  ">
+                                        <div class="product-reviews dataComment">
+                                            
+                                        </div>
+                                        <div>
+                                            <ul class="reviews-pages" id="pageData">
+                                                
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h4 class="text-uppercase">Đánh giá của bạn</h4>
+
+                                        <form class="review-form">
+                                            @if (Session["CustomerId"] != null)
+                                            {
+                                                <div class="form-group">
+                                                    <textarea class="input txtfeedback" placeholder="Your review"></textarea>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="input-rating">
+                                                        <strong class="text-uppercase">Đánh giá </strong>
+                                                        <div class="stars" id="stars">
+                                                            <input type="radio" id="star5" name="rating" /><label class="starclick"  for="star5" data-value="5"></label>
+                                                            <input type="radio" id="star4" name="rating" /><label class="starclick" for="star4" data-value="4"></label>
+                                                            <input type="radio" id="star3" name="rating" /><label class="starclick" for="star3" data-value="3"></label>
+                                                            <input type="radio" id="star2" name="rating" /><label class="starclick" for="star2" data-value="2"></label>
+                                                            <input type="radio" id="star1" name="rating" /><label class="starclick" for="star1" data-value="1"></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <a href="javascript:void(0)" class="primary-btn postComment" data-id="@Model.ProductId">Bình luận</a>
+                                            }
+                                            else
+                                            {
+                                                <a href="" data-toggle="modal" data-target="#myModal">Vui lòng đăng nhập để viết..</a>
+                                            }
+                                        </form>
+                                    </div>
+                                </div>
+
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            <!-- /Product Details -->
+        </div>
+        <!-- /row -->
+    </div>
+    <!-- /container -->
+</div>
+@section scripts{
+
+    <script>
+        function postComent(star, content, id) {
+            $.ajax({
+                type: 'POST',
+                url: '/Home/postComment',
+                data: {
+                    'Star': star,
+                    'Content': content,
+                    'ProductId': id
+                }, success: function (res) {
+                    if (res == "success") {
+                        alert("Cảm ơn bạn về phản hồi!");
+                        $('.txtfeedback').val("");
+                        $(".starclick").removeClass("datastars");   
+                        LoadCommet();
+                    } else {
+                        alert("không thể bình luận. Vui lòng kiểm tra lại thao tác!");
+                        
+                    }
+                }
+
+            })
+
+        }
+        
+        function LoadCommet(pageNumber, pageSize) {
+            var idproduct = $('.dataId').data('id');
+            $.ajax({
+                type: 'Get',
+                url: '/Home/loadComment',
+                data: {
+                    'page': pageNumber,
+                    'pageSize': pageSize,
+                    'id': idproduct
+                },
+
+                success: function (res) {
+                    res = JSON.parse(res);
+                    console.log(res);
+                    var conntent = "";
+                    $.each(res.Data, function (key, value) {
+                       
+                        conntent += '  <div class="single-review">';
+                        conntent += '     <div class="review-heading">';
+                        conntent += '        <div><a href="#"><img src="'+ value.Customer.Avatar +' " width="25" height="25"/> '+ value.Customer.CustomerName + '</a></div>';
+                        conntent += '        <div><a href="#"><i class="fa fa-clock-o"></i> '+ value.CreateDate +'</a></div>';
+                        conntent += '        <div class="review-rating pull-right">';
+                         for (var i = 0; i < value.Star; i++) {
+                           conntent += ' <i class="fa fa-star"></i>'
+                               }
+                        conntent += ' </div> </div><div class="review-body">';
+                               
+                        conntent += ' <p>' + value.Content + '</p> </div></div >';
+                               
+                    })
+                    $('.dataComment').html(conntent);
+                    var active = "";
+                    var Previous = (res.CurrentPage - 1) > 1 ? (res.CurrentPage - 1) : 1;
+                    var Next = (res.CurrentPage + 1) < res.PageOfNumber ? res.CurrentPage + 1 : res.PageOfNumber;
+                    var pageData = '<li ><a onclick="LoadCommet(' + Previous + ',' + pageSize + '); return false;" href="javascript:void(0)" >Previous</a></li>';
+                    for (var i = 1; i < res.PageOfNumber + 1; i++) {
+                        active = i == res.CurrentPage ? "active" : ""
+                        pageData += '<li class=" '+ active +' " ><a onclick="LoadCommet(' + i + ',' + pageSize + '); return false;" href="javascript:void(0)">' + i + '</a></li>';
+                    }
+                    pageData += '<li ><a  onclick="LoadCommet( ' + Next + ',' + pageSize + '); return false;" href="#" >Next</a></li>';
+                    $('#pageData').html(pageData);
+                }
+
+            });
+
+        }
+
+        $(function () {
+            LoadCommet();
+            $('.postComment').on('click', function (evt) {
+                var button = $(evt.target),
+                    id = button.data('id'),
+                    content = $('.txtfeedback').val(),
+                    star = $(".datastars").data('value');
+                postComent(star, content, id)
+
+            })
+                
+            $(".starclick").on('click',  function () {
+                $(".starclick").removeClass("datastars");
+                $(this).addClass("datastars");
+            })
+               
+        });
+    </script>
+}
+
+

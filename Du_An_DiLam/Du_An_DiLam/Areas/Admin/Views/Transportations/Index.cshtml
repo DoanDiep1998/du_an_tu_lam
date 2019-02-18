@@ -1,0 +1,46 @@
+﻿@model IEnumerable<Data.DataModel.Transportation>
+
+@{
+    ViewBag.Title = "Phương thức vận chuyển";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.TransportationName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.CraeteDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Show)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.TransportationName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.CraeteDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Show)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.TransportationId }) |
+            @Html.ActionLink("Details", "Details", new { id=item.TransportationId }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.TransportationId })
+        </td>
+    </tr>
+}
+
+</table>

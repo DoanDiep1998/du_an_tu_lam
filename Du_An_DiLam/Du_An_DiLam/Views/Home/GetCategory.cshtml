@@ -1,0 +1,35 @@
+﻿@using Data.DataModel;
+@model IEnumerable<CategoryDetail>
+@{
+    /**/
+
+    Layout = null;
+}
+@{
+
+    
+
+    foreach (var item in Model)
+    {
+
+        <li class="dropdown side-dropdown">
+            <a class="dropdown-toggle"  href="@Url.Action("ProductByCategory","Home",new {@id=item.CategoryDetailId })">@item.CategoryDetailName<i class="fa fa-angle-right"></i></a>
+            @*<div class="custom-menu ">
+                <div class="row">
+
+                    <ul class="list-links">
+
+                       
+                    </ul>
+
+
+
+                </div>
+
+            </div>*@
+        </li>
+    }
+}
+
+
+

@@ -1,0 +1,62 @@
+﻿@model IEnumerable<Data.DataModel.Bill>
+@{
+    ViewBag.Title = "Bill";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<table class="shopping-cart-table table">
+    <thead>
+        <tr>
+            <th>Tên người mua</th>
+            <th>Tên người nhận</th>
+
+            <th>Tổng tiền</th>
+            <th>Ngày mua</th>
+            <th>Số điện thoại</th>
+            <th>Địa chỉ</th>
+            <th>Trạng thái</th>
+
+            <th>Tác vụ</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Customer.CustomerName</td>
+                <td>@item.CustomerName</td>
+                <td>@String.Format("{0:0,0}", item.TotalMoney)<sup>đ</sup> </td>
+                <td>@item.CreateDate</td>
+                <td>@item.Phone</td>
+                <td>@item.Address</td>
+                @if (item.Status == false)
+                {
+                    <td style="color:darksalmon">Chờ xử lý</td>
+                }
+                else
+                {
+                    <td style="color:aqua">Đã xử lý</td>
+                }
+
+
+                <td class="text-right">
+                    <button class="main-btn btn-detail " data-id="@item.BillId" data-toggle="modal" data-target="#myModalBillDetail"><i class="fa fa-book"> </i>  chi tiết</button>
+                </td>
+                @if (item.Status == false)
+                {
+                    <td><button class="main-btn icon-btn"><i class="fa fa-close"></i></button></td>
+                }
+                else
+                {
+                    <td></td>
+                }
+
+
+            </tr>
+        }
+    </tbody>
+
+</table>
+

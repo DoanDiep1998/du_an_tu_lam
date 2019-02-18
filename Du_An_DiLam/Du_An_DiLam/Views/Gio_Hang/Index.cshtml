@@ -1,0 +1,120 @@
+﻿@model Data.DataModel.Bill
+
+@{
+    ViewBag.Title = "Giỏ hàng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container">
+    <div class="row">
+        <form id="checkout-form" class="clearfix">
+            <div class="col-md-6">
+                <div class="billing-details">
+                    <p>Bạn đã có tài khoản ? <a href="javascript:void(0)" data-toggle="modal" data-target="#myModal">Đăng nhập</a></p>
+                    <div class="section-title">
+                        <h3 class="title">Chi tiết đơn hàng</h3>
+                    </div>
+                    <div class="form-group">
+                        <span>Họ và tên</span>
+                        <input class="input namec" type="text" value="@Session["CustomerName"]" name="first-name" placeholder="Họ và tên">
+                    </div>
+                    
+                    <div class="form-group">
+                        <span>Email</span>
+                        <input class="input Emailc" type="email" value="@Session["Email"]" placeholder="Email">
+                    </div>
+                    <div class="form-group">
+                        <span>Điện thoại</span>
+                        <input class="input phonec" type="text" value="@Session["Phone"]"  placeholder="Điện thoại">
+                    </div>
+                    <div class="form-group">
+                        <span>Phương thức thanh toán</span>
+                        @Html.DropDownList("PaymentId", null, htmlAttributes: new { @class = "form-control paymentc" })
+                    </div>
+                    <div class="form-group">
+                        <span>Phương thức vận chuyển</span>
+                        @Html.DropDownList("TransportationId", null, htmlAttributes: new { @class = "form-control Transportc" })
+                    </div>
+
+                    <div class="form-group">
+                        <span>Địa chỉ</span>
+                        <input class="input addressc" type="text" value="@Session["Address"]" name="country" placeholder="Địa chỉ">
+                    </div>
+                    <div class="form-group">
+                        <span>Chú thích</span>
+                        <input class="input commentc" type="text"  placeholder="Chú thích">
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="input-checkbox">
+                           
+                            <a href="" class="font-weak" for="register">Tạo tài khoản?</a>
+                          
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+              
+            </div>
+
+            <div class="col-md-12">
+                <div class="order-summary clearfix">
+                    <div class="section-title">
+                        
+                        <h3 class="title thong_bao_rong"></h3>
+                    </div>
+                    <table class="shopping-cart-table table">
+                        <thead>
+                            <tr>
+                                <th>Sản phẩm</th>
+                                <th></th>
+                                <th class="text-center">Giá</th>
+                                <th class="text-center">Số lượng</th>
+                                <th class="text-center">Tổng tiền</th>
+                                <th class="text-right"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="hienthidanhsachsp">
+
+                            <tr>
+                                <td class="thumb"><img src="~/Content/img/thumb-product01.jpg" alt=""></td>
+                                <td class="details">
+                                    <a href="#">Product Name Goes Here</a>
+                                    <ul>
+                                        <li><span>Size: XL</span></li>
+                                        <li><span>Color: Camelot</span></li>
+                                    </ul>
+                                </td>
+                                <td class="price text-center"><strong>$32.50</strong></td>
+                                <td class="qty text-center"><input class="input" type="number" value="1"></td>
+                                <td class="total text-center"><strong class="primary-color">$32.50</strong></td>
+                                <td class="text-right"><button class="main-btn icon-btn"><i class="fa fa-close"></i></button></td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th class="empty" colspan="3"></th>
+                                <th>Tổng số lượng</th>
+                                <th colspan="2" class="qty"></th>
+                            </tr>
+                            
+                            <tr>
+                                <th class="empty" colspan="3"></th>
+                                <th>Tổng tiền</th>
+                                <th colspan="2" class="total totalmoney"></th> 
+                            </tr>
+
+                        </tfoot>
+                    </table>
+                    <div class="pull-right">
+                        <a href="javascript: void(0)" class="primary-btn thanh_toan ">Thanh toán</a>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+

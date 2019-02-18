@@ -1,0 +1,365 @@
+﻿
+
+
+@{
+    ViewBag.Title = "Thương hiệu";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+<!--dong này để bind html quan phân trang-->
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-sanitize.js"></script>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                Bảng Thương hiệu
+            </div>
+
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+
+                <div ng-app="myApp" ng-controller="myCtrl">
+                    <div class="form-inline">
+                        <input type="text" ng-model="keySearch" class="form-control" name="name" value="" />
+                    </div>
+                    <div>
+                        <td><button data-toggle="modal" data-target="#myModal" ng-click="ModalClear()">Thêm mới</button></td>
+                        <p>{{msg}}</p> 
+                    </div>
+                    <!-- Button to Open the Modal -->
+                    <!-- The Modal -->
+
+                    <div class="modal" id="myModal">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <!-- Modal Header -->
+                                <div class="modal-header">
+                                    <h4 class="modal-title">Thương Hiệu</h4>
+
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                </div>
+                                <!-- Modal body -->
+                                <div class="modal-body">
+                                    <form action="" method="post">
+
+                                        Tên hiệu :
+                                        <input type="text" name="name" value="" ng-model="Name" class="form-control" />
+
+
+                                        Thuộc danh mục:
+                                        <select class="form-control" ng-model="Category">
+                                            <option ng-repeat="c in LoadCategoryValue " value="{{c.CategoryId}}" class="form-control">
+                                                {{c.CategoryName}}
+                                            </option>
+                                        </select>
+
+                                        Trạng thái show:
+                                        <input type="checkbox" name="name" value="" ng-model="Status" class="form-control" />
+                                        <div ng-if="btn_edit==false">
+                                            <input type="submit" name="name" value="Lưu" ng-click="insertdata()" />
+                                        </div>
+
+                                        <div ng-if="btn_edit===true">
+                                            <input type="submit" name="name" value="Sửa" ng-click="edit()" />
+                                        </div>
+
+                                    </form>
+                                </div>
+                                <!-- Modal footer -->
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <table width="100%" class="table-bordered">
+                        <thead>
+                            <tr>
+
+                                <th>Thương hiệu</th>
+                                <th>Trạng thái</th>
+                                <th>Tác vụ</th>
+
+
+
+                            </tr>
+                        </thead>
+                        <tbody id="list-data">
+
+                            <tr ng-repeat="s in supplier.Data | filter: keySearch">
+
+                                <td>{{s.SupplierName}}</td>
+                                <td> {{s.Show ? 'Hiển thị':'không hiển thị'}}</td>
+                                <td>
+                                    <button ng-click="delete(s.SupplierId);">xóa</button>
+                                    <button data-toggle="modal" data-target="#myModal" ng-click="loadedit(s.SupplierId,s.SupplierName,s.Show,s.CategoryId);">Sửa</button>
+                                    <button ng-click="Detail(s.SupplierId);">Chi tiết</button>
+
+                                </td>
+
+
+
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div>
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination">
+                                @*<li class="page-item"><a class="page-link" href="" ng-click="getAll(Pageprev)";>Previous</a></li>*@
+
+                                <li class="page-item" ng-repeat="page in  Numpage"><a class="page-link" href="" ng-click="getAll(page);">{{page}}</a></li>
+                                
+                                @*<li class="page-item"><a class="page-link" href="" ng-click="getAll(PageNext)";>Next</a></li>*@
+                            </ul>
+                        </nav>
+                    </div>
+                    
+                   
+
+                </div>
+
+                
+                <!-- /.table-responsive -->
+                
+            </div>
+            <!-- /.panel-body -->
+        </div>
+        <!-- /.panel -->
+    </div>
+    <!--
+        /.col-lg-12 -->
+</div>
+@section scripts{
+    <script>
+        var app = angular.module('myApp', ['ngSanitize']);
+        // lấy ra 
+        app.controller('myCtrl', function ($scope, $http) {
+            //làm mất nút
+            $scope.btn_edit = false;
+         
+
+            //hàm được load khi hoàn thành các tác vụ
+            $scope.getAll = function (page,pageSize) {
+                //khởi tạo mảng
+           
+                $http({
+                    method: 'post',
+                    url: '/Admin/Supplier/GetAll',
+                    data: {
+                        'page': page,
+                        'pageSize': pageSize
+                    }
+                    //nếu thành công
+                }).then(function mySuccess(response) {
+                    //chuyển đổi dữ liệu json
+                    console.log(JSON.parse(response.data));                    
+                    //ép dữ liệu vào mảng
+                    $scope.supplier = JSON.parse(response.data);
+                    // sau khi tải lại thì phải cập nhật lại số lượng trang
+                    $scope.ToPageList();
+                    // thất bại
+                }, function myError(response) {
+                    $scope.mydata = response.statusText;
+                    return myError;
+                });
+
+
+            }
+
+            // Hàm này để hiển thị khi bắt đầu tải trang
+
+            $scope.supplier = [];//sử dụng trong phân trang và tải trang
+            
+            $http({
+                method: 'post',
+                url: '/Admin/Supplier/GetAll',
+                
+                //nếu thành công
+            }).then(function mySuccess(response) {
+                //chuyển đổi dữ liệu json
+                console.log(JSON.parse(response.data));
+                //ép dữ liệu vào mảng
+                $scope.supplier = JSON.parse(response.data);
+                $scope.ToPageList();
+                // thất bại
+            }, function myError(response) {
+                $scope.mydata = response.statusText;
+            });
+            //hàm xử lý phân trang
+            // black page
+            //$scope.Pageprev = ($scope.supplier.CurrentPage - 1) >= 1 ? ($scope.supplier.CurrentPage - 1) : 1;
+            // next page
+           // $scope.PageNext =  ($scope.supplier.CurrentPage + 1) < $scope.supplier.PageOfNumber ? ($scope.supplier.CurrentPage + 1) : $scope.supplier.PageOfNumber ;
+            
+            // mảng lưu số trang
+            $scope.Numpage = [];
+            
+            
+            $scope.ToPageList = function () {
+               
+                for (var i = 1; i < $scope.supplier.PageOfNumber +1; i++) {
+
+                    // push để thêm phần tử i vào cuối mảng và cách dấu phẩy
+                    $scope.Numpage.push(i);
+                }
+               
+            }
+            //Hàm load Category
+            $scope.LoadCategoryValue = []
+            $scope.LoadCategory = function () {
+                $http({
+                    method: 'GET',
+                    url: '/Admin/Supplier/GetCategory'
+
+                }).then(function success(res) {
+                    console.log(JSON.parse(res.data));
+                    $scope.LoadCategoryValue = JSON.parse(res.data);
+                    }, function error(res) {
+                        $scope.mydata = response.statusText;
+                    }
+                        );
+                    
+
+            }
+           
+           //thêm mơi
+            $scope.insertdata = function () {
+                
+                $http({
+                    method: 'post',
+                    url: '/Admin/Supplier/Create',
+
+                    data: {
+                        'SupplierName': $scope.Name,             
+                        'CategoryID': $scope.Category,
+                        'Show': $scope.Status
+                    } 
+                }).then(function success(response) {
+                    alert('thêm  thành công!!')
+                    $scope.getAll();
+                }, function myError(response) {
+                    alert('thêm thất bại');
+                    $scope.getAll();
+                }
+                );
+            }
+            //xóa
+            $scope.delete = function (SupplierId) {
+                
+                $http({
+                    method: 'post',
+                    url: '/Admin/Supplier/Delete',
+                    data: { 'id': SupplierId }
+                }).then(function success(response) {
+                    alert('xóa thành công!!')
+                    $scope.getAll();
+                     
+                }, function myError(response) { 
+                    alert('thất bại');
+                    $scope.getAll();
+                }
+                );
+            }
+            // load form sửa
+            $scope.Id = '';// chuyền Id biến Id 
+            $scope.loadedit = function (SupplierId, SupplierName, Show, CategoryId) {
+                //đẩy Id vào biến Id
+                $scope.LoadCategory();
+                $scope.Id = SupplierId;
+                $scope.Name = SupplierName;
+                $scope.Status = Show;
+                $scope.Category = CategoryId;
+                $scope.btn_edit = true;
+              
+
+            }
+            //tạo hàm sửa
+            $scope.edit = function () {
+                $http({
+                    method: 'post',
+                    url: '/Admin/Supplier/Edit',
+                    data: {
+                        'SupplierId': $scope.Id,
+                        'SupplierName': $scope.Name,
+                        'CategoryID': $scope.Category,
+                        'Show': $scope.Status
+                    }
+                }).then(function success(response) {
+                    alert('Sửa thông tin thành công');
+                    $scope.getAll();
+
+                }, function error(response) {
+                    alert('Sửa thông tin thất bại');
+                    $scope.getAll();
+                }
+                )
+            }
+            //Hàm xóa dữ liệu khi thêm mới
+            $scope.ModalClear = function () {
+                $scope.btn_edit = false ;
+                $scope.Id = "";
+                $scope.Name = "";
+                $scope.Status = "";
+                $scope.Category = "";
+                $scope.LoadCategory();
+            }
+            $scope.Detail = function (SupplierId) {
+
+                $http({
+                    method: 'Post',
+                    url: '/Admin/Supplier/Detail',
+                    data: { 'id': SupplierId }
+                }).then(function success(response) {
+                    window.location.href ='/Admin/Supplier/Detail/' + SupplierId;
+                   
+
+                }, function error(response) {
+                    
+                    $scope.getAll();
+                }
+                )
+            }
+
+        });
+        //thêm mới
+        
+           
+           
+    
+        
+        //xử lý click dòng sự kiện
+        //$(document).on("click", "#list-data>tr", function () {
+        //    // Bỏ tất cả class active ở các tr
+        //    $("#list-data>tr").removeClass("active");
+        //    //xóa thược tính style khi không được chọn
+        //    $("#list-data>tr").removeAttr("style");
+        //    // Thêm class active cho phần tử tr đang được click
+        //    $(this).addClass("active");
+        //    //thêm màu
+        //    $(this).css('background','#CB3D3D');
+        //})
+        //$(function () {
+        //    //XÓA
+        //    $("#btn_click").click(function () {                            
+        //        // Lấy id 
+        //        var id = $("#list-data>tr.active").data('id');
+        //        if (id == undefined) {
+        //            alert('bạn chưa chọn bản ghi nào')
+        //        } else {
+        //            Delete(id);
+        //            Delete = true;
+        //        }
+               
+               
+
+        //    })
+           
+        //})
+      
+            
+    </script>
+    }
+
+
+

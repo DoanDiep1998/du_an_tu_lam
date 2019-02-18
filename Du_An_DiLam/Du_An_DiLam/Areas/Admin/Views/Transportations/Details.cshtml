@@ -1,0 +1,43 @@
+﻿@model Data.DataModel.Transportation
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Transportation</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.TransportationName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TransportationName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CraeteDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CraeteDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Show)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Show)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.TransportationId }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

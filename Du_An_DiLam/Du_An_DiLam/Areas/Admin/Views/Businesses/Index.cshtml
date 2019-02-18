@@ -1,0 +1,72 @@
+﻿
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+
+<p>
+    <button class="btn-update">cập nhật danh sách</button>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Tên các mục</th>
+        </tr>
+    </thead>
+    <tbody class="data-list">
+
+    </tbody>
+
+
+
+
+
+</table>
+@section scripts{
+   <script>
+       function GetAll() {
+           $.ajax({
+               type: 'get',
+               url: 'Businesses/getAll',
+               data: {},
+               success: function (res) {
+                   res = JSON.parse(res),
+                       console.log(res)
+                   var row =""
+                   $.each(res, function (key, value) {
+                       key++;
+                       row += "<tr>";
+                       row += '<td>' + value.BusinessId + '</td>';     
+                       row += '<td>' + value.BusinessName + '</td>';     
+                       row += "</tr>";
+                   })
+                   $('.data-list').empty();
+                   $('.data-list').html(row);
+               }
+           })
+       }
+       $(function () {
+           GetAll();
+           $('.btn-update').on('click', function () {
+
+               $.ajax({
+                   
+                   type: 'get',
+                   url: 'Businesses/updateBusiness',
+                   data: {},
+                   success: function (res) {
+                       if (res == "success") {
+                           alert('Cập nhập thành công');
+                           GetAll();
+                       }
+                   }
+               })
+
+           })
+       })
+    </script>
+}
+  

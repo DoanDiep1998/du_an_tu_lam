@@ -1,0 +1,340 @@
+﻿
+@model Data.DataModel.Banner
+@{
+    ViewBag.Title = "Banner";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                DataTables Advanced Tables
+            </div>
+
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+                <div class="col-md-12">
+                    <div class="col-md-6">
+                                <input type="text" id="txtSearch" class="form-control" placeholder="Search">
+                                                       
+                    </div>
+                    <div class="col-md-2">                                
+                                <select class="form-control" id="txtSelect">
+                                    <option value="Name">Tên</option>
+                                    <option value="Content">Nội dung</option>
+                                </select>                          
+                    </div>
+                   
+                    
+                </div>
+                <div class="col-md-12"><br /></div>
+                <div class="col-md-6">
+                    <label>
+
+
+                        <button>  <a data-toggle="modal" data-target="#myModal">Thêm mới</a></button>
+                        <button id="btn-edit" class="btn-warning">Sửa</button>
+                        <button id="btn-delete" class="btn-danger">Xóa</button>
+                        <button id="btn-detail">Chi tiết</button>
+                    </label>
+                </div>
+                
+                <!-- Button to Open the Modal -->
+                <!-- The Modal -->
+
+                <div class="modal" id="myModal">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <!-- Modal Header -->
+                            <div class="modal-header">
+                                <h4 class="modal-title">
+                                    Banner<h4>
+
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            </div>
+
+                            <!-- Modal body -->
+                            @using (Html.BeginForm())
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                                <div class="modal-body">
+
+                                    <form action="" method="post">
+
+                                        Tên Banner:
+                                        <input type="text" name="BannerName" value="" id="BannerName" required class="form-control" />
+                                       <h5 id="BnNameErr" class="text-danger"></h5>
+                                        <input type="file" name="file" value="" id="file" required class="form-control" />
+                                        <h5 id="fileErr" class="text-danger"></h5>
+                                        Đường dẫn
+                                        <input type="text" name="Link" value="" required id="Link" class="form-control" />
+                                        <h5 id="LinkErr" class="text-danger"></h5>
+                                        Nội dung
+                                        <input type="text" name="Content" value="" required id="Content" class="form-control" />
+                                        <h5 id="ContentErr" class="text-danger"></h5>
+
+
+                                    </form>
+                                </div>
+                            }
+                            <!-- Modal footer -->
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-default" id="btn-save">Lưu</button>
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <table width="100%" class="table-bordered" id="dataTables-example">
+                    <thead>
+                        <tr>
+                            <th>Tên Baner</th>
+                            <th>ảnh baner</th>
+                            <th> đường dẫn</th>
+                            <th>Nội dung</th>
+
+
+                        </tr>
+                    </thead>
+                    <tbody id="data"></tbody>
+
+                </table>
+
+                <!-- /.table-responsive -->
+                <ul class="pagination" id="pageData">
+                    
+                </ul>
+            </div>
+            <!-- /.panel-body -->
+        </div>
+
+        <!-- /.panel -->
+    </div>
+    <!--s
+        /.col-lg-12 -->
+
+
+</div>
+
+@section scripts{
+    <script>
+
+        
+        function LoadData(pageNumber, pageSize,txtSearch, txtSelect) {
+            $.ajax({
+                type: 'GET',
+                url: '/Admin/Banners/GetAll',
+                data: {
+                    'txtSearch': txtSearch,
+                    'txtSelect': txtSelect,
+                    'page': pageNumber,
+                    'pageSize': pageSize
+
+                },
+                success: function (res) {
+                    res = JSON.parse(res);
+                    console.log(res);
+                    var row = ""
+                    $.each(res.Data, function (key, value) {
+                        key++;
+                        row += '<tr data-id="' + value.BannerId + '">';
+                        row += '<td>' + value.BannerName + '</td>';
+                        row += '<td><img src="' + value.Picture + '" width="75" /></td>';
+                        row += '<td>' + value.Link + '</td>';
+                        row += '<td>' + value.Content + '</td>';
+                        row += '</tr>'
+                    })
+                    $('#data').html(row);
+                    // phân trang
+                    
+                    var active = "";
+                    var Previous = (res.CurrentPage - 1) > 1 ? (res.CurrentPage - 1) : 1;
+                    var Next = (res.CurrentPage + 1) < res.PageOfNumber ? res.CurrentPage + 1 : res.PageOfNumber;
+                    var pageData = '<li class="page-item"><a class="page - link" onclick="LoadData(' + Previous + ',' + pageSize +'); return false;" href="javascript:void(0)" >Previous</a></li>';
+                    for (var i = 1; i < res.PageOfNumber +1; i++) {
+                        active = i == res.CurrentPage ? "active" : "";
+                        
+                        pageData += '<li class="page-item ' + active + '" ><a class="page-link"  onclick="LoadData(' + i + ',' + pageSize +'); return false;" href="javascript:void(0)">' + i + '</a></li>';
+
+                           
+
+                    }
+                    pageData += '<li class="page-item"><a class="page-link" onclick="LoadData( ' + Next + ',' + pageSize +'); return false;" href="#" >Next</a></li>';
+                    $('#pageData').html(pageData);
+                }
+            });
+        }
+        function Detail(id) {
+            $.ajax({
+                url: '/Admin/Banners/Details',
+                type: 'Get',
+                data: { 'id': id },
+                success: function (res) {
+                    window.location.href = '/Admin/Banners/Details/' + id;
+                }
+            })
+        }
+        // xóa
+        function Delete(id) {
+            $.ajax({
+                type: 'Post',
+                url: '/Admin/Banners/Delete',
+                data: { 'id': id },
+                success: function (res) {
+                    if (res == "success") {
+                        
+                        alert("xóa thành công");
+                        
+                        LoadData();
+                    } else {
+                        
+                        alert("có lỗi khi xóa");
+                        LoadData();
+                    }
+                }
+
+            });
+        }
+        //  sửa, thêm mới
+        function Post_Data(url, Banners) {
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: Banners,
+
+                contentType: false, // không  header
+                processData: false,// ko sử lý dữ liệu
+                success: function (res) {
+                    if (res == 'success') {
+                        alert('cập nhập thành công');
+                        $('#myModal').modal().hide();
+                        LoadData();
+                    } else {
+                        alert('có lỗi !!')
+                        
+                        LoadData();
+                    }
+                }
+            });
+        }
+        //lấy dữ liệu
+        var idEdit = "";
+        function Get_By_Id(id) {
+            $.ajax({
+                type: "GET",
+                url: '/Admin/Banners/Get_By_Id',
+                data: { 'id': id },
+                success: function (res) {
+                    res = JSON.parse(res);
+                    console.log(res)
+                    if (res != null) {
+                        $('#BannerName').val(res.BannerName);
+                        $('#file').val(res.file);
+                        $('#Link').val(res.Link);
+                        $('#Content').val(res.Content);
+                        idEdit = res.BannerId;
+                        $("#myModal").modal('show');
+                    } else {
+                        alert('Không thể lấy bản ghi !!');
+                    }
+                }
+
+            });
+
+        }
+        $(function () {
+            var edit = false;
+            LoadData();
+
+            $('#btn-save').click(function () {
+                if ($('#BannerName').val() == "") {
+                    $('#BnNameErr').html(" Vui lòng nhập tên!")
+                } else if ($('#file').val() == "") {
+                    $('#fileErr').html(" Vui lòng chọn file!")
+                } else if ($('#Content').val() == "") {
+                    $('#ContentErr').html(" Vui lòng nhập nội dung!")
+                } else if ($('#Link').val() == "") {
+                    $('#LinkErr').html(" Vui lòng nhập link!")
+                } else {
+                    if (window.FormData != undefined) {
+                        var data = new FormData();
+                        //lấy đối tượng upload file
+                        var Upfile = $('#file').get(0);
+                        // lấy các file ra khỏi đối tượng Upfile
+                        var files = Upfile.files;
+                        data.append('BannerId', idEdit);
+                        data.append('BannerName', $('#BannerName').val());
+                        data.append('Link', $('#Link').val());
+                        data.append('Content', $('#Content').val());
+                        data.append('fileUpload', files[0]);
+                        if (edit == true) {
+                            Post_Data("/Admin/Banners/Edit", data);
+                            edit = false;
+                            idEdit = "";
+                        } else {
+                            Post_Data("/Admin/Banners/Create", data);
+                        }
+                    } else {
+                        alert('trình duyệt không hỗ trợ bảng, vui lòng chọn trình duyệt khác!!');
+                    }
+                }
+
+
+
+               
+            })
+            // css cho thuộc tính khí click vào bảng
+            $(document).on('click', "#data>tr", function () {
+                $("#data>tr").removeClass("active");
+                $("#data>tr").removeAttr("style");
+                $(this).addClass("active");
+                $(this).css('background', '#CB3D3D');
+
+
+            })
+            // hàm xóa
+            $("#btn-delete").click(function () {
+                var id = $("#data>tr.active").data('id');
+                if (id == undefined) {
+                    alert('vui lòng click vào bản ghi cần xóa');
+                } else {
+                    Delete(id);
+                }
+
+            })
+            $('#btn-edit').click(function () {
+                var id = $('#data>tr.active').data('id');
+                if (id == undefined) {
+                    alert('vui lòng chọn bản ghi cần  cập nhật');
+                } else {
+                    Get_By_Id(id);
+                    edit = true;
+
+                }
+            })
+            $('#btn-detail').click(function () {
+                var id = $('#data>tr.active').data('id');
+                if (id == undefined) {
+                    alert('vui lòng chọn bản ghi');
+                } else {
+                    Detail(id);
+                }
+            })
+            $('#txtSearch').keyup(function () {
+                var txtSearch = $('#txtSearch').val();
+                var txtSelect = $('#txtSelect').val();
+                if (txtSearch == null) {
+
+                } else {
+                    LoadData(1, 3, txtSearch, txtSelect)
+                }
+            })
+
+        });
+
+    </script>
+}

@@ -1,0 +1,40 @@
+﻿@model IEnumerable<Data.DataModel.Permisstion_Group>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Business.BusinessName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.PermistionName)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Business.BusinessName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.PermistionName)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.Permisstion_GroupId }) |
+            @Html.ActionLink("Details", "Details", new { id=item.Permisstion_GroupId }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.Permisstion_GroupId })
+        </td>
+    </tr>
+}
+
+</table>

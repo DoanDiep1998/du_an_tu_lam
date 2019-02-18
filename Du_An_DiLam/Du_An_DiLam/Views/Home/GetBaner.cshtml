@@ -1,0 +1,20 @@
+﻿@using Data.DataModel;
+@model IEnumerable<Banner>
+@{
+    Layout = null;
+}
+
+@{
+    foreach (var item in Model)
+    {
+        <div class="banner banner-1">
+            <img src="@item.Picture" width="1200" height="475" alt="">
+            <div class="banner-caption">
+                <h1 class="white-color">@item.BannerName <span>@item.Content</span></h1>
+                <br/>
+                <br />
+                <a href="" class="primary-btn">Xem </a>
+            </div>
+        </div>
+    }
+}

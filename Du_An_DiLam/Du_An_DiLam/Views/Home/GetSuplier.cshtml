@@ -1,0 +1,21 @@
+﻿@using Data.DataModel;
+@model IEnumerable<Supplier>
+@{
+   
+    
+}
+
+<div class="col-md-4">
+    <ul class="list-links">
+        @{
+            foreach (var item in Model)
+            {
+                <li><a href="@Url.Action("ProductBySuplier","Home",new {@id =item.SupplierId })">@item.SupplierName</a></li>
+            }
+        }
+
+
+    </ul>
+    <hr class="hidden-md hidden-lg">
+</div>
+
